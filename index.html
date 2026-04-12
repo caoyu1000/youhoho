@@ -19,6 +19,7 @@
             justify-content: center;
             align-items: center;
             padding: 20px;
+            overflow: hidden;
         }
 
         .container {
@@ -28,6 +29,8 @@
             max-width: 500px;
             width: 100%;
             box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+            position: relative;
+            z-index: 10;
         }
 
         .step {
@@ -67,6 +70,7 @@
             border-radius: 10px;
             cursor: pointer;
             font-weight: bold;
+            transition: all 0.3s ease;
         }
 
         .btn-primary {
@@ -74,9 +78,18 @@
             color: white;
         }
 
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(102, 126, 234, 0.4);
+        }
+
         .btn-secondary {
             background: #f0f0f0;
             color: #666;
+        }
+
+        .btn-secondary:hover {
+            background: #e0e0e0;
         }
 
         .date-grid {
@@ -92,12 +105,14 @@
             text-align: center;
             cursor: pointer;
             font-size: 16px;
+            transition: all 0.3s ease;
         }
 
         .date-item.selected {
             border-color: #667eea;
             background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
             color: white;
+            transform: scale(1.02);
         }
 
         .city-grid {
@@ -114,6 +129,7 @@
             text-align: center;
             cursor: pointer;
             font-size: 15px;
+            transition: all 0.3s ease;
         }
 
         .city-item.selected {
@@ -128,14 +144,33 @@
         }
 
         .result-icon {
-            font-size: 60px;
+            font-size: 80px;
             margin-bottom: 20px;
+            animation: bounce 1s ease infinite;
+        }
+
+        @keyframes bounce {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-20px); }
+        }
+
+        .boom-icon {
+            font-size: 100px;
+            margin-bottom: 20px;
+            animation: shake 0.5s ease infinite;
+        }
+
+        @keyframes shake {
+            0%, 100% { transform: rotate(0deg); }
+            25% { transform: rotate(-10deg); }
+            75% { transform: rotate(10deg); }
         }
 
         .result-text {
-            font-size: 18px;
+            font-size: 20px;
             color: #666;
             line-height: 1.8;
+            margin-bottom: 20px;
         }
 
         .result-detail {
@@ -163,10 +198,123 @@
             background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
             transition: width 0.3s ease;
         }
+
+        /* 炸弹爆炸效果 */
+        .explosion {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            font-size: 200px;
+            opacity: 0;
+            pointer-events: none;
+            z-index: 1000;
+        }
+
+        .explosion.animate {
+            animation: explode 1.5s ease-out forwards;
+        }
+
+        @keyframes explode {
+            0% {
+                opacity: 0;
+                transform: translate(-50%, -50%) scale(0) rotate(0deg);
+            }
+            50% {
+                opacity: 1;
+                transform: translate(-50%, -50%) scale(1.5) rotate(180deg);
+            }
+            100% {
+                opacity: 0;
+                transform: translate(-50%, -50%) scale(2) rotate(360deg);
+            }
+        }
+
+        /* 屏幕震动效果 */
+        .screen-shake {
+            animation: screenShake 0.5s ease;
+        }
+
+        @keyframes screenShake {
+            0%, 100% { transform: translate(0, 0); }
+            10% { transform: translate(-10px, -10px); }
+            20% { transform: translate(10px, 10px); }
+            30% { transform: translate(-10px, 10px); }
+            40% { transform: translate(10px, -10px); }
+            50% { transform: translate(-5px, 5px); }
+            60% { transform: translate(5px, -5px); }
+        }
+
+        /* 礼花效果 */
+        .confetti {
+            position: fixed;
+            width: 10px;
+            height: 10px;
+            top: -10px;
+            z-index: 999;
+            pointer-events: none;
+        }
+
+        .confetti.animate {
+            animation: confetti-fall 3s ease-out forwards;
+        }
+
+        @keyframes confetti-fall {
+            0% {
+                transform: translateY(0) rotate(0deg);
+                opacity: 1;
+            }
+            100% {
+                transform: translateY(100vh) rotate(720deg);
+                opacity: 0;
+            }
+        }
+
+        /* BOOM文字效果 */
+        .boom-text {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            font-size: 80px;
+            font-weight: bold;
+            color: #ff4d4f;
+            text-shadow: 0 0 20px rgba(255, 77, 79, 0.8);
+            opacity: 0;
+            pointer-events: none;
+            z-index: 1001;
+        }
+
+        .boom-text.animate {
+            animation: boomText 1s ease-out forwards;
+        }
+
+        @keyframes boomText {
+            0% {
+                opacity: 0;
+                transform: translate(-50%, -50%) scale(0);
+            }
+            50% {
+                opacity: 1;
+                transform: translate(-50%, -50%) scale(1.2);
+            }
+            100% {
+                opacity: 0;
+                transform: translate(-50%, -50%) scale(1.5);
+            }
+        }
+
+        /* 成功页面的彩带 */
+        .success-bg {
+            background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%) !important;
+        }
     </style>
 </head>
 <body>
-    <div class="container">
+    <div class="explosion" id="explosion">💥</div>
+    <div class="boom-text" id="boomText">BOOM!</div>
+
+    <div class="container" id="mainContainer">
         <div class="progress-bar">
             <div class="progress-fill" id="progressBar" style="width: 0%"></div>
         </div>
@@ -229,28 +377,28 @@
 
         <div class="step" id="stepResult">
             <div class="result">
-                <div class="result-icon">✅</div>
-                <h1>提交成功！</h1>
+                <div class="result-icon">🎊</div>
+                <h1>太棒了！</h1>
                 <div class="result-detail">
                     <p><strong>可用时间：</strong><span id="resultDates"></span></p>
                     <p><strong>想去城市：</strong><span id="resultCity"></span></p>
                 </div>
-                <p class="result-text">期待和你一起度过美好的五一假期！🎊</p>
+                <p class="result-text">期待和你一起度过美好的五一假期！<br>我们不见不散哦~ 💕</p>
             </div>
         </div>
 
         <div class="step" id="stepEnd">
             <div class="result">
-                <div class="result-icon">😢</div>
-                <h1>好的吧~</h1>
-                <p class="result-text">那下次再约哦！<br>期待下次有机会一起玩~</p>
+                <div class="boom-icon">💣</div>
+                <h1 style="color: #ff4d4f;">BOOM!</h1>
+                <p class="result-text">居然没空！<br>炸弹爆炸了！💥</p>
             </div>
         </div>
 
         <div class="step" id="stepNotEnoughDays">
             <div class="result">
-                <div class="result-icon">😅</div>
-                <h1>时间有点少呢~</h1>
+                <div class="boom-icon">💣</div>
+                <h1 style="color: #ff4d4f;">BOOM!</h1>
                 <p class="result-text" id="notEnoughDaysText"></p>
             </div>
         </div>
@@ -271,21 +419,77 @@
             updateProgress(step);
         }
 
+        function createExplosion() {
+            // 创建爆炸效果
+            const explosion = document.getElementById('explosion');
+            const boomText = document.getElementById('boomText');
+            const container = document.getElementById('mainContainer');
+            
+            explosion.classList.add('animate');
+            boomText.classList.add('animate');
+            container.classList.add('screen-shake');
+            
+            // 播放震动效果
+            if (navigator.vibrate) {
+                navigator.vibrate([200, 100, 200]);
+            }
+            
+            setTimeout(() => {
+                explosion.classList.remove('animate');
+                boomText.classList.remove('animate');
+                container.classList.remove('screen-shake');
+            }, 1500);
+        }
+
+        function createConfetti() {
+            // 创建礼花效果
+            const colors = ['#ff0000', '#00ff00', '#0000ff', '#ffff00', '#ff00ff', '#00ffff', '#ffa500', '#ff69b4'];
+            
+            for (let i = 0; i < 50; i++) {
+                setTimeout(() => {
+                    const confetti = document.createElement('div');
+                    confetti.className = 'confetti animate';
+                    confetti.style.left = Math.random() * 100 + 'vw';
+                    confetti.style.backgroundColor = colors[Math.floor(Math.random() * colors.length)];
+                    confetti.style.borderRadius = Math.random() > 0.5 ? '50%' : '0';
+                    confetti.style.animationDuration = (Math.random() * 2 + 2) + 's';
+                    confetti.style.animationDelay = Math.random() * 0.5 + 's';
+                    
+                    document.body.appendChild(confetti);
+                    
+                    setTimeout(() => {
+                        confetti.remove();
+                    }, 4000);
+                }, i * 30);
+            }
+            
+            // 改变背景
+            document.body.classList.add('success-bg');
+        }
+
         function handleNoTime() {
-            document.querySelectorAll('.step').forEach(s => s.classList.remove('active'));
-            document.getElementById('stepEnd').classList.add('active');
-            updateProgress(4);
+            createExplosion();
+            
+            setTimeout(() => {
+                document.querySelectorAll('.step').forEach(s => s.classList.remove('active'));
+                document.getElementById('stepEnd').classList.add('active');
+                updateProgress(4);
+            }, 800);
         }
 
         function handleNotEnoughDays() {
-            document.querySelectorAll('.step').forEach(s => s.classList.remove('active'));
-            document.getElementById('stepNotEnoughDays').classList.add('active');
+            createExplosion();
             
-            const daysCount = selectedDates.length;
-            const message = `只选了${daysCount}天，下次多留点时间吧~`;
-            document.getElementById('notEnoughDaysText').textContent = message;
-            
-            updateProgress(4);
+            setTimeout(() => {
+                document.querySelectorAll('.step').forEach(s => s.classList.remove('active'));
+                document.getElementById('stepNotEnoughDays').classList.add('active');
+                
+                const daysCount = selectedDates.length;
+                const message = `只选了${daysCount}天！<br>BOOM！下次多留点时间吧~ 💥`;
+                document.getElementById('notEnoughDaysText').innerHTML = message;
+                
+                updateProgress(4);
+            }, 800);
         }
 
         function goToStep2() {
@@ -330,6 +534,11 @@
 
             goToStep('Result');
             updateProgress(4);
+            
+            // 播放庆祝效果
+            setTimeout(() => {
+                createConfetti();
+            }, 300);
         }
 
         updateProgress(1);
