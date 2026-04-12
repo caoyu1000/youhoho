@@ -28,18 +28,6 @@
             max-width: 500px;
             width: 100%;
             box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
-            animation: slideUp 0.5s ease-out;
-        }
-
-        @keyframes slideUp {
-            from {
-                opacity: 0;
-                transform: translateY(30px);
-            }
-            to {
-                opacity: 1;
-                transform: translateY(0);
-            }
         }
 
         .step {
@@ -48,12 +36,6 @@
 
         .step.active {
             display: block;
-            animation: fadeIn 0.4s ease-out;
-        }
-
-        @keyframes fadeIn {
-            from { opacity: 0; }
-            to { opacity: 1; }
         }
 
         h1 {
@@ -84,7 +66,6 @@
             border: none;
             border-radius: 10px;
             cursor: pointer;
-            transition: all 0.3s ease;
             font-weight: bold;
         }
 
@@ -93,23 +74,13 @@
             color: white;
         }
 
-        .btn-primary:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 5px 15px rgba(102, 126, 234, 0.4);
-        }
-
         .btn-secondary {
             background: #f0f0f0;
             color: #666;
         }
 
-        .btn-secondary:hover {
-            background: #e0e0e0;
-        }
-
         .date-grid {
             display: grid;
-            grid-template-columns: repeat(1, 1fr);
             gap: 12px;
             margin: 20px 0;
         }
@@ -120,7 +91,6 @@
             border-radius: 10px;
             text-align: center;
             cursor: pointer;
-            transition: all 0.3s ease;
             font-size: 16px;
         }
 
@@ -128,12 +98,6 @@
             border-color: #667eea;
             background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
             color: white;
-            transform: scale(1.02);
-        }
-
-        .date-item:hover {
-            border-color: #667eea;
-            transform: translateY(-2px);
         }
 
         .city-grid {
@@ -141,8 +105,6 @@
             grid-template-columns: repeat(2, 1fr);
             gap: 12px;
             margin: 20px 0;
-            max-height: 400px;
-            overflow-y: auto;
         }
 
         .city-item {
@@ -151,7 +113,6 @@
             border-radius: 8px;
             text-align: center;
             cursor: pointer;
-            transition: all 0.3s ease;
             font-size: 15px;
         }
 
@@ -159,10 +120,6 @@
             border-color: #667eea;
             background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
             color: white;
-        }
-
-        .city-item:hover {
-            border-color: #667eea;
         }
 
         .result {
@@ -179,7 +136,6 @@
             font-size: 18px;
             color: #666;
             line-height: 1.8;
-            margin-bottom: 20px;
         }
 
         .result-detail {
@@ -193,11 +149,6 @@
         .result-detail p {
             margin: 10px 0;
             font-size: 16px;
-            color: #333;
-        }
-
-        .result-detail strong {
-            color: #667eea;
         }
 
         .progress-bar {
@@ -205,31 +156,12 @@
             background: #f0f0f0;
             border-radius: 2px;
             margin-bottom: 30px;
-            overflow: hidden;
         }
 
         .progress-fill {
             height: 100%;
             background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
             transition: width 0.3s ease;
-        }
-
-        @media (max-width: 480px) {
-            .container {
-                padding: 30px 20px;
-            }
-
-            h1 {
-                font-size: 24px;
-            }
-
-            .question {
-                font-size: 18px;
-            }
-
-            .city-grid {
-                grid-template-columns: repeat(2, 1fr);
-            }
         }
     </style>
 </head>
@@ -250,7 +182,7 @@
 
         <div class="step" id="step2">
             <h1>📅 选择日期</h1>
-            <p class="question">五一哪几天有时间呢？<br><small style="color: #999;">（至少选择2天）</small></p>
+            <p class="question">五一哪几天有时间呢？</p>
             <div class="date-grid" id="dateGrid">
                 <div class="date-item" data-date="5月1日" onclick="toggleDate(this)">5月1日（周三）</div>
                 <div class="date-item" data-date="5月2日" onclick="toggleDate(this)">5月2日（周四）</div>
@@ -289,7 +221,6 @@
                 <div class="city-item" data-city="苏州" onclick="selectCity(this)">苏州</div>
                 <div class="city-item" data-city="天津" onclick="selectCity(this)">天津</div>
             </div>
-            <p class="error-message" id="cityError" style="color: #ff4d4f; font-size: 14px; margin-top: 10px; text-align: center; display: none;">请选择一个城市哦~</p>
             <div class="btn-group">
                 <button class="btn-secondary" onclick="goToStep(2)">上一步</button>
                 <button class="btn-primary" onclick="submitForm()">提交</button>
@@ -351,7 +282,7 @@
             document.getElementById('stepNotEnoughDays').classList.add('active');
             
             const daysCount = selectedDates.length;
-            const message = `只选了${daysCount}天，至少需要2天才能一起玩哦！下次多留点时间吧~`;
+            const message = `只选了${daysCount}天，下次多留点时间吧~`;
             document.getElementById('notEnoughDaysText').textContent = message;
             
             updateProgress(4);
@@ -386,29 +317,16 @@
             });
             element.classList.add('selected');
             selectedCity = element.dataset.city;
-            document.getElementById('cityError').style.display = 'none';
         }
 
         function submitForm() {
             if (!selectedCity) {
-                document.getElementById('cityError').style.display = 'block';
+                alert('请选择一个城市哦~');
                 return;
             }
 
             document.getElementById('resultDates').textContent = selectedDates.join('、');
             document.getElementById('resultCity').textContent = selectedCity;
-
-            const data = {
-                dates: selectedDates,
-                city: selectedCity,
-                time: new Date().toLocaleString('zh-CN')
-            };
-            
-            let allResponses = JSON.parse(localStorage.getItem('surveyResponses') || '[]');
-            allResponses.push(data);
-            localStorage.setItem('surveyResponses', JSON.stringify(allResponses));
-            
-            console.log('提交的数据：', data);
 
             goToStep('Result');
             updateProgress(4);
@@ -418,4 +336,3 @@
     </script>
 </body>
 </html>
-
