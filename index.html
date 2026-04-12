@@ -120,6 +120,8 @@
             grid-template-columns: repeat(2, 1fr);
             gap: 12px;
             margin: 20px 0;
+            max-height: 450px;
+            overflow-y: auto;
         }
 
         .city-item {
@@ -136,6 +138,62 @@
             border-color: #667eea;
             background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
             color: white;
+        }
+
+        .city-item.other-city {
+            grid-column: span 2;
+            background: #fff9e6;
+            border-color: #ffd666;
+        }
+
+        .city-item.other-city.selected {
+            background: linear-gradient(135deg, #faad14 0%, #ffc53d 100%);
+            border-color: #faad14;
+        }
+
+        .custom-city-input {
+            display: none;
+            margin-top: 15px;
+            padding: 15px;
+            background: #f8f9fa;
+            border-radius: 10px;
+            animation: slideDown 0.3s ease-out;
+        }
+
+        .custom-city-input.show {
+            display: block;
+        }
+
+        @keyframes slideDown {
+            from {
+                opacity: 0;
+                transform: translateY(-10px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .custom-city-input label {
+            display: block;
+            font-size: 14px;
+            color: #666;
+            margin-bottom: 8px;
+        }
+
+        .custom-city-input input {
+            width: 100%;
+            padding: 12px;
+            border: 2px solid #e0e0e0;
+            border-radius: 8px;
+            font-size: 16px;
+            outline: none;
+            transition: border-color 0.3s ease;
+        }
+
+        .custom-city-input input:focus {
+            border-color: #667eea;
         }
 
         .result {
@@ -199,7 +257,6 @@
             transition: width 0.3s ease;
         }
 
-        /* 炸弹爆炸效果 */
         .explosion {
             position: fixed;
             top: 50%;
@@ -230,7 +287,6 @@
             }
         }
 
-        /* 屏幕震动效果 */
         .screen-shake {
             animation: screenShake 0.5s ease;
         }
@@ -245,7 +301,6 @@
             60% { transform: translate(5px, -5px); }
         }
 
-        /* 礼花效果 */
         .confetti {
             position: fixed;
             width: 10px;
@@ -270,7 +325,6 @@
             }
         }
 
-        /* BOOM文字效果 */
         .boom-text {
             position: fixed;
             top: 50%;
@@ -304,9 +358,26 @@
             }
         }
 
-        /* 成功页面的彩带 */
         .success-bg {
             background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%) !important;
+        }
+
+        @media (max-width: 480px) {
+            .container {
+                padding: 30px 20px;
+            }
+
+            h1 {
+                font-size: 24px;
+            }
+
+            .question {
+                font-size: 18px;
+            }
+
+            .city-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
         }
     </style>
 </head>
@@ -368,7 +439,14 @@
                 <div class="city-item" data-city="长沙" onclick="selectCity(this)">长沙</div>
                 <div class="city-item" data-city="苏州" onclick="selectCity(this)">苏州</div>
                 <div class="city-item" data-city="天津" onclick="selectCity(this)">天津</div>
+                <div class="city-item other-city" data-city="其他" onclick="selectOtherCity(this)">✨ 其他（自行填写）</div>
             </div>
+            
+            <div class="custom-city-input" id="customCityInput">
+                <label>请输入你想去的城市：</label>
+                <input type="text" id="customCityText" placeholder="例如：拉萨、哈尔滨、珠海..." oninput="updateCustomCity(this.value)">
+            </div>
+
             <div class="btn-group">
                 <button class="btn-secondary" onclick="goToStep(2)">上一步</button>
                 <button class="btn-primary" onclick="submitForm()">提交</button>
@@ -407,6 +485,7 @@
     <script>
         let selectedDates = [];
         let selectedCity = '';
+        let isOtherCity = false;
 
         function updateProgress(step) {
             const progress = ((step - 1) / 3) * 100;
@@ -420,7 +499,6 @@
         }
 
         function createExplosion() {
-            // 创建爆炸效果
             const explosion = document.getElementById('explosion');
             const boomText = document.getElementById('boomText');
             const container = document.getElementById('mainContainer');
@@ -429,7 +507,6 @@
             boomText.classList.add('animate');
             container.classList.add('screen-shake');
             
-            // 播放震动效果
             if (navigator.vibrate) {
                 navigator.vibrate([200, 100, 200]);
             }
@@ -442,7 +519,6 @@
         }
 
         function createConfetti() {
-            // 创建礼花效果
             const colors = ['#ff0000', '#00ff00', '#0000ff', '#ffff00', '#ff00ff', '#00ffff', '#ffa500', '#ff69b4'];
             
             for (let i = 0; i < 50; i++) {
@@ -463,7 +539,6 @@
                 }, i * 30);
             }
             
-            // 改变背景
             document.body.classList.add('success-bg');
         }
 
@@ -519,13 +594,37 @@
             document.querySelectorAll('.city-item').forEach(item => {
                 item.classList.remove('selected');
             });
+            
             element.classList.add('selected');
             selectedCity = element.dataset.city;
+            isOtherCity = false;
+            
+            document.getElementById('customCityInput').classList.remove('show');
+            document.getElementById('customCityText').value = '';
+        }
+
+        function selectOtherCity(element) {
+            document.querySelectorAll('.city-item').forEach(item => {
+                item.classList.remove('selected');
+            });
+            
+            element.classList.add('selected');
+            selectedCity = '其他';
+            isOtherCity = true;
+            
+            document.getElementById('customCityInput').classList.add('show');
+            document.getElementById('customCityText').focus();
+        }
+
+        function updateCustomCity(value) {
+            if (value.trim()) {
+                selectedCity = value.trim();
+            }
         }
 
         function submitForm() {
-            if (!selectedCity) {
-                alert('请选择一个城市哦~');
+            if (!selectedCity || (isOtherCity && !document.getElementById('customCityText').value.trim())) {
+                alert('请选择或输入一个城市哦~');
                 return;
             }
 
@@ -535,7 +634,6 @@
             goToStep('Result');
             updateProgress(4);
             
-            // 播放庆祝效果
             setTimeout(() => {
                 createConfetti();
             }, 300);
