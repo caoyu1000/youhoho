@@ -212,54 +212,40 @@
             50% { transform: translateY(-20px); }
         }
 
-        .cat-gun-icon {
-            font-size: 100px;
-            margin-bottom: 20px;
-            animation: catShoot 0.8s ease;
-        }
-
-        @keyframes catShoot {
-            0% {
-                transform: scale(0) rotate(0deg);
-            }
-            50% {
-                transform: scale(1.3) rotate(-15deg);
-            }
-            70% {
-                transform: scale(1.1) rotate(5deg);
-            }
-            100% {
-                transform: scale(1) rotate(0deg);
-            }
-        }
-
-        .gunshot {
+        .cat-image-popup {
             position: fixed;
             top: 50%;
             left: 50%;
-            transform: translate(-50%, -50%);
-            font-size: 150px;
+            transform: translate(-50%, -50%) scale(0);
+            width: 280px;
+            height: 280px;
+            object-fit: cover;
+            border-radius: 20px;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.5);
+            z-index: 1001;
             opacity: 0;
             pointer-events: none;
-            z-index: 1000;
         }
 
-        .gunshot.animate {
-            animation: gunshotEffect 0.6s ease-out forwards;
+        .cat-image-popup.show {
+            animation: catPopup 1s ease-out forwards;
         }
 
-        @keyframes gunshotEffect {
+        @keyframes catPopup {
             0% {
                 opacity: 0;
-                transform: translate(-50%, -50%) scale(0);
+                transform: translate(-50%, -50%) scale(0) rotate(-10deg);
             }
-            30% {
+            50% {
                 opacity: 1;
-                transform: translate(-50%, -50%) scale(1.5);
+                transform: translate(-50%, -50%) scale(1.15) rotate(5deg);
+            }
+            70% {
+                transform: translate(-50%, -50%) scale(0.95) rotate(-2deg);
             }
             100% {
-                opacity: 0;
-                transform: translate(-50%, -50%) scale(2);
+                opacity: 1;
+                transform: translate(-50%, -50%) scale(1) rotate(0deg);
             }
         }
 
@@ -362,11 +348,20 @@
             .city-grid {
                 grid-template-columns: repeat(2, 1fr);
             }
+            
+            .cat-image-popup {
+                width: 240px;
+                height: 240px;
+            }
         }
     </style>
 </head>
 <body>
-    <div class="gunshot" id="gunshot">💥</div>
+    <img src="cat.jpg" 
+         alt="猫猫警察" 
+         class="cat-image-popup" 
+         id="catImage">
+    
     <div class="screen-flash" id="screenFlash"></div>
 
     <div class="container" id="mainContainer">
@@ -451,7 +446,6 @@
 
         <div class="step" id="stepEnd">
             <div class="result">
-                <div class="cat-gun-icon">🐱🔫</div>
                 <h1 style="color: #ff4d4f;">砰！</h1>
                 <p class="result-text">居然没空！<br>被猫猫枪毙了！☠️</p>
             </div>
@@ -459,7 +453,6 @@
 
         <div class="step" id="stepNotEnoughDays">
             <div class="result">
-                <div class="cat-gun-icon">🐱🔫</div>
                 <h1 style="color: #ff4d4f;">砰！</h1>
                 <p class="result-text" id="notEnoughDaysText"></p>
             </div>
@@ -482,11 +475,11 @@
             updateProgress(step);
         }
 
-        function createGunshot() {
-            const gunshot = document.getElementById('gunshot');
+        function showCatImage() {
+            const catImage = document.getElementById('catImage');
             const screenFlash = document.getElementById('screenFlash');
             
-            gunshot.classList.add('animate');
+            catImage.classList.add('show');
             screenFlash.classList.add('animate');
             
             if (navigator.vibrate) {
@@ -494,9 +487,8 @@
             }
             
             setTimeout(() => {
-                gunshot.classList.remove('animate');
                 screenFlash.classList.remove('animate');
-            }, 800);
+            }, 300);
         }
 
         function createConfetti() {
@@ -524,7 +516,7 @@
         }
 
         function handleNoTime() {
-            createGunshot();
+            showCatImage();
             
             setTimeout(() => {
                 document.querySelectorAll('.step').forEach(s => s.classList.remove('active'));
@@ -534,7 +526,7 @@
         }
 
         function handleNotEnoughDays() {
-            createGunshot();
+            showCatImage();
             
             setTimeout(() => {
                 document.querySelectorAll('.step').forEach(s => s.classList.remove('active'));
