@@ -292,7 +292,6 @@ input[type="text"]:focus {
             <div class="progress-fill" style="width: 33%"></div>
         </div>
         <h1>📅 五一哪天有空？</h1>
-        <p class="subtitle">请选择至少两天</p>
         
         <div class="date-grid">
             <div class="date-item" data-date="5月1日" onclick="toggleDate(this)">
@@ -317,11 +316,9 @@ input[type="text"]:focus {
             </div>
         </div>
         
-        <div class="error-message" id="dateError">请至少选择两天哦！</div>
-        
         <div class="btn-group">
             <button class="btn-secondary" onclick="resetDates()">重置</button>
-            <button class="btn-primary" onclick="nextToCity()">下一步</button>
+            <button class="btn-primary" onclick="checkAndNext()">下一步</button>
         </div>
     </div>
 
@@ -352,9 +349,13 @@ input[type="text"]:focus {
         
         <div class="error-message" id="cityError">请选择一个城市！</div>
         
-        <div class="btn-group">
+        <div class="btn-group" style="margin-top: 20px;">
             <button class="btn-secondary" onclick="backToStep1()">上一步</button>
             <button class="btn-primary" onclick="nextToSubmit()">下一步</button>
+        </div>
+        
+        <div class="btn-group" style="margin-top: 12px;">
+            <button class="btn-secondary" onclick="restart()" style="width: 100%;">重新开始</button>
         </div>
     </div>
 
@@ -395,6 +396,9 @@ input[type="text"]:focus {
             <div class="end-icon">😢</div>
             <h1>太可惜了...</h1>
             <p class="subtitle">等你有空的时候再约吧！</p>
+            <div class="btn-group" style="margin-top: 40px;">
+                <button class="btn-primary" onclick="restart()">重新开始</button>
+            </div>
         </div>
     </div>
 </div>
@@ -414,8 +418,6 @@ function toggleDate(element) {
         element.classList.add('selected');
         selectedDates.push(date);
     }
-    
-    document.getElementById('dateError').classList.remove('show');
 }
 
 function resetDates() {
@@ -425,13 +427,12 @@ function resetDates() {
     selectedDates = [];
 }
 
-function nextToCity() {
+function checkAndNext() {
     if (selectedDates.length < 2) {
-        document.getElementById('dateError').classList.add('show');
-        return;
+        showStep('endPage');
+    } else {
+        showStep('step2');
     }
-    
-    showStep('step2');
 }
 
 function selectCity(element) {
@@ -497,19 +498,21 @@ function backToStep2() {
     showStep('step2');
 }
 
+function restart() {
+    resetDates();
+    selectedCity = '';
+    customCityName = '';
+    document.getElementById('customCity').value = '';
+    document.getElementById('otherInput').classList.remove('show');
+    document.getElementById('cityError').classList.remove('show');
+    showStep('step1');
+}
+
 function showStep(stepId) {
     document.querySelectorAll('.step').forEach(step => {
         step.classList.remove('active');
     });
     document.getElementById(stepId).classList.add('active');
-}
-
-function checkDatesAndProceed() {
-    if (selectedDates.length < 2) {
-        showStep('endPage');
-    } else {
-        nextToCity();
-    }
 }
 </script>
 </body>
