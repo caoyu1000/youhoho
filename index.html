@@ -300,6 +300,55 @@ input[type="text"]:focus {
     margin-bottom: 25px;
 }
 
+.success-summary {
+    background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+    padding: 25px;
+    border-radius: 16px;
+    margin: 25px 0;
+    text-align: left;
+}
+
+.success-item {
+    margin: 15px 0;
+    padding: 15px;
+    background: white;
+    border-radius: 12px;
+}
+
+.success-label {
+    font-size: 13px;
+    color: #999;
+    margin-bottom: 6px;
+    font-weight: 600;
+}
+
+.success-value {
+    font-size: 17px;
+    color: #333;
+    font-weight: 600;
+    line-height: 1.6;
+}
+
+.success-intro {
+    margin-top: 15px;
+    padding: 15px;
+    background: white;
+    border-radius: 12px;
+}
+
+.success-intro-title {
+    font-size: 14px;
+    color: #667eea;
+    font-weight: 700;
+    margin-bottom: 8px;
+}
+
+.success-intro-text {
+    font-size: 14px;
+    color: #555;
+    line-height: 1.6;
+}
+
 .end-page {
     text-align: center;
     padding: 50px 20px;
@@ -441,6 +490,29 @@ input[type="text"]:focus {
             <div class="success-icon">🎉</div>
             <h1>提交成功！</h1>
             <p class="subtitle">期待一起度过美好的五一假期！</p>
+            
+            <div class="success-summary">
+                <div class="success-item">
+                    <div class="success-label">📅 有空日期</div>
+                    <div class="success-value" id="successDates"></div>
+                </div>
+                <div class="success-item">
+                    <div class="success-label">🏙️ 目的地</div>
+                    <div class="success-value" id="successCity"></div>
+                </div>
+                <div class="success-intro" id="successFoodIntro" style="display: none;">
+                    <div class="success-intro-title">🍜 美食推荐</div>
+                    <div class="success-intro-text" id="successFood"></div>
+                </div>
+                <div class="success-intro" id="successPlayIntro" style="display: none;">
+                    <div class="success-intro-title">🎯 必玩景点</div>
+                    <div class="success-intro-text" id="successPlay"></div>
+                </div>
+            </div>
+            
+            <div class="btn-group" style="margin-top: 30px;">
+                <button class="btn-primary" onclick="restart()">重新开始</button>
+            </div>
         </div>
     </div>
 
@@ -495,7 +567,7 @@ const cityData = {
         play: '洪崖洞、磁器口、解放碑、长江索道、武隆、大足石刻'
     },
     '南京': {
-        food: '盐水鸭、鸭血粉丝汤、秦淮小吃、盐水鸭、牛肉锅贴、梅花糕',
+        food: '盐水鸭、鸭血粉丝汤、秦淮小吃、牛肉锅贴、梅花糕',
         play: '夫子庙、中山陵、玄武湖、明孝陵、总统府、秦淮河'
     },
     '武汉': {
@@ -588,6 +660,21 @@ function nextToSubmit() {
 }
 
 function submitForm() {
+    const cityText = selectedCity === 'other' ? customCityName : selectedCity;
+    
+    document.getElementById('successDates').textContent = selectedDates.join('、');
+    document.getElementById('successCity').textContent = cityText;
+    
+    if (cityData[selectedCity]) {
+        document.getElementById('successFood').textContent = cityData[selectedCity].food;
+        document.getElementById('successPlay').textContent = cityData[selectedCity].play;
+        document.getElementById('successFoodIntro').style.display = 'block';
+        document.getElementById('successPlayIntro').style.display = 'block';
+    } else {
+        document.getElementById('successFoodIntro').style.display = 'none';
+        document.getElementById('successPlayIntro').style.display = 'none';
+    }
+    
     showStep('successPage');
     
     console.log('提交的数据：', {
