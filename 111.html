@@ -1,0 +1,554 @@
+我来帮您创建一个五一假期安排的网页，包含日期选择、城市选择和提交功能。
+
+```html
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>五一假期安排</title>
+<style>
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'PingFang SC', 'Hiragino Sans GB', 'Microsoft YaHei', sans-serif;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    min-height: 100vh;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: 20px;
+}
+
+.container {
+    background: white;
+    border-radius: 20px;
+    padding: 40px 30px;
+    max-width: 600px;
+    width: 100%;
+    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+}
+
+h1 {
+    color: #333;
+    text-align: center;
+    margin-bottom: 10px;
+    font-size: 28px;
+}
+
+.subtitle {
+    text-align: center;
+    color: #666;
+    margin-bottom: 30px;
+    font-size: 14px;
+}
+
+.step {
+    display: none;
+}
+
+.step.active {
+    display: block;
+    animation: fadeIn 0.5s ease;
+}
+
+@keyframes fadeIn {
+    from { opacity: 0; transform: translateY(20px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+.date-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(100px, 1fr));
+    gap: 15px;
+    margin: 30px 0;
+}
+
+.date-item {
+    padding: 15px;
+    border: 2px solid #e0e0e0;
+    border-radius: 12px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    text-align: center;
+}
+
+.date-item:hover {
+    border-color: #667eea;
+    transform: translateY(-2px);
+}
+
+.date-item.selected {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+    border-color: #667eea;
+}
+
+.date-day {
+    font-size: 18px;
+    font-weight: bold;
+    margin-bottom: 5px;
+}
+
+.date-weekday {
+    font-size: 12px;
+    opacity: 0.8;
+}
+
+.btn-group {
+    display: flex;
+    gap: 15px;
+    margin-top: 30px;
+}
+
+button {
+    flex: 1;
+    padding: 15px;
+    font-size: 16px;
+    border: none;
+    border-radius: 12px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    font-weight: bold;
+}
+
+.btn-primary {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+}
+
+.btn-primary:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 5px 15px rgba(102, 126, 234, 0.4);
+}
+
+.btn-secondary {
+    background: #f0f0f0;
+    color: #666;
+}
+
+.btn-secondary:hover {
+    background: #e0e0e0;
+}
+
+.city-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 12px;
+    margin: 20px 0;
+}
+
+.city-item {
+    padding: 15px;
+    border: 2px solid #e0e0e0;
+    border-radius: 12px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    text-align: center;
+    font-size: 14px;
+}
+
+.city-item:hover {
+    border-color: #667eea;
+    transform: scale(1.05);
+}
+
+.city-item.selected {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+    border-color: #667eea;
+}
+
+.other-input {
+    margin-top: 15px;
+    display: none;
+}
+
+.other-input.show {
+    display: block;
+    animation: slideDown 0.3s ease;
+}
+
+@keyframes slideDown {
+    from { opacity: 0; max-height: 0; }
+    to { opacity: 1; max-height: 100px; }
+}
+
+input[type="text"] {
+    width: 100%;
+    padding: 12px;
+    border: 2px solid #e0e0e0;
+    border-radius: 10px;
+    font-size: 14px;
+    transition: border-color 0.3s;
+}
+
+input[type="text"]:focus {
+    outline: none;
+    border-color: #667eea;
+}
+
+.summary {
+    background: #f8f9fa;
+    padding: 20px;
+    border-radius: 12px;
+    margin: 20px 0;
+}
+
+.summary-item {
+    margin: 10px 0;
+    padding: 10px;
+    background: white;
+    border-radius: 8px;
+}
+
+.summary-label {
+    color: #666;
+    font-size: 12px;
+    margin-bottom: 5px;
+}
+
+.summary-value {
+    color: #333;
+    font-size: 16px;
+    font-weight: bold;
+}
+
+.error-message {
+    color: #f44336;
+    text-align: center;
+    margin-top: 15px;
+    font-size: 14px;
+    display: none;
+}
+
+.error-message.show {
+    display: block;
+    animation: shake 0.5s;
+}
+
+@keyframes shake {
+    0%, 100% { transform: translateX(0); }
+    25% { transform: translateX(-10px); }
+    75% { transform: translateX(10px); }
+}
+
+.success-page {
+    text-align: center;
+    padding: 40px 20px;
+}
+
+.success-icon {
+    font-size: 80px;
+    margin-bottom: 20px;
+}
+
+.end-page {
+    text-align: center;
+    padding: 40px 20px;
+}
+
+.end-icon {
+    font-size: 80px;
+    margin-bottom: 20px;
+}
+
+.progress-bar {
+    height: 4px;
+    background: #e0e0e0;
+    border-radius: 2px;
+    margin-bottom: 30px;
+    overflow: hidden;
+}
+
+.progress-fill {
+    height: 100%;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    transition: width 0.3s ease;
+}
+</style>
+</head>
+<body>
+<div class="container">
+    <!-- 步骤1：选择日期 -->
+    <div id="step1" class="step active">
+        <div class="progress-bar">
+            <div class="progress-fill" style="width: 33%"></div>
+        </div>
+        <h1>📅 五一哪天有空？</h1>
+        <p class="subtitle">请选择至少两天（5月1日-5月5日）</p>
+        
+        <div class="date-grid">
+            <div class="date-item" data-date="5月1日" onclick="toggleDate(this)">
+                <div class="date-day">5月1日</div>
+                <div class="date-weekday">周四</div>
+            </div>
+            <div class="date-item" data-date="5月2日" onclick="toggleDate(this)">
+                <div class="date-day">5月2日</div>
+                <div class="date-weekday">周五</div>
+            </div>
+            <div class="date-item" data-date="5月3日" onclick="toggleDate(this)">
+                <div class="date-day">5月3日</div>
+                <div class="date-weekday">周六</div>
+            </div>
+            <div class="date-item" data-date="5月4日" onclick="toggleDate(this)">
+                <div class="date-day">5月4日</div>
+                <div class="date-weekday">周日</div>
+            </div>
+            <div class="date-item" data-date="5月5日" onclick="toggleDate(this)">
+                <div class="date-day">5月5日</div>
+                <div class="date-weekday">周一</div>
+            </div>
+        </div>
+        
+        <div class="error-message" id="dateError">请至少选择两天哦！</div>
+        
+        <div class="btn-group">
+            <button class="btn-secondary" onclick="resetDates()">重置</button>
+            <button class="btn-primary" onclick="nextToCity()">下一步</button>
+        </div>
+    </div>
+
+    <!-- 步骤2：选择城市 -->
+    <div id="step2" class="step">
+        <div class="progress-bar">
+            <div class="progress-fill" style="width: 66%"></div>
+        </div>
+        <h1>🏙️ 想去哪里玩？</h1>
+        <p class="subtitle">选择一个心仪的城市</p>
+        
+        <div class="city-grid">
+            <div class="city-item" data-city="北京" onclick="selectCity(this)">北京</div>
+            <div class="city-item" data-city="上海" onclick="selectCity(this)">上海</div>
+            <div class="city-item" data-city="广州" onclick="selectCity(this)">广州</div>
+            <div class="city-item" data-city="深圳" onclick="selectCity(this)">深圳</div>
+            <div class="city-item" data-city="成都" onclick="selectCity(this)">成都</div>
+            <div class="city-item" data-city="杭州" onclick="selectCity(this)">杭州</div>
+            <div class="city-item" data-city="西安" onclick="selectCity(this)">西安</div>
+            <div class="city-item" data-city="重庆" onclick="selectCity(this)">重庆</div>
+            <div class="city-item" data-city="南京" onclick="selectCity(this)">南京</div>
+            <div class="city-item" data-city="武汉" onclick="selectCity(this)">武汉</div>
+            <div class="city-item" data-city="other" onclick="selectOtherCity(this)">其他 ✏️</div>
+        </div>
+        
+        <div class="other-input" id="otherInput">
+            <input type="text" id="customCity" placeholder="请输入你想去的城市..." oninput="updateCustomCity()">
+        </div>
+        
+        <div class="error-message" id="cityError">请选择一个城市！</div>
+        
+        <div class="btn-group">
+            <button class="btn-secondary" onclick="backToStep1()">上一步</button>
+            <button class="btn-primary" onclick="nextToSubmit()">下一步</button>
+        </div>
+    </div>
+
+    <!-- 步骤3：确认提交 -->
+    <div id="step3" class="step">
+        <div class="progress-bar">
+            <div class="progress-fill" style="width: 100%"></div>
+        </div>
+        <h1>✅ 确认信息</h1>
+        <p class="subtitle">请确认以下信息是否正确</p>
+        
+        <div class="summary">
+            <div class="summary-item">
+                <div class="summary-label">有空日期</div>
+                <div class="summary-value" id="summaryDates"></div>
+            </div>
+            <div class="summary-item">
+                <div class="summary-label">目的地</div>
+                <div class="summary-value" id="summaryCity"></div>
+            </div>
+        </div>
+        
+        <div class="btn-group">
+            <button class="btn-secondary" onclick="backToStep2()">返回修改</button>
+            <button class="btn-primary" onclick="submitForm()">提交</button>
+        </div>
+    </div>
+
+    <!-- 成功页面 -->
+    <div id="successPage" class="step">
+        <div class="success-page">
+            <div class="success-icon">🎉</div>
+            <h1>提交成功！</h1>
+            <p class="subtitle">期待和你一起度过美好的五一假期！</p>
+        </div>
+    </div>
+
+    <!-- 结束页面（选择不足两天） -->
+    <div id="endPage" class="step">
+        <div class="end-page">
+            <div class="end-icon">😢</div>
+            <h1>太可惜了...</h1>
+            <p class="subtitle">等你有空的时候再约吧！</p>
+        </div>
+    </div>
+</div>
+
+<script>
+let selectedDates = [];
+let selectedCity = '';
+let customCityName = '';
+
+// 切换日期选择
+function toggleDate(element) {
+    const date = element.dataset.date;
+    
+    if (element.classList.contains('selected')) {
+        element.classList.remove('selected');
+        selectedDates = selectedDates.filter(d => d !== date);
+    } else {
+        element.classList.add('selected');
+        selectedDates.push(date);
+    }
+    
+    // 隐藏错误提示
+    document.getElementById('dateError').classList.remove('show');
+}
+
+// 重置日期选择
+function resetDates() {
+    document.querySelectorAll('.date-item').forEach(item => {
+        item.classList.remove('selected');
+    });
+    selectedDates = [];
+}
+
+// 进入城市选择
+function nextToCity() {
+    if (selectedDates.length < 2) {
+        document.getElementById('dateError').classList.add('show');
+        return;
+    }
+    
+    showStep('step2');
+}
+
+// 选择城市
+function selectCity(element) {
+    document.querySelectorAll('.city-item').forEach(item => {
+        item.classList.remove('selected');
+    });
+    
+    element.classList.add('selected');
+    selectedCity = element.dataset.city;
+    document.getElementById('otherInput').classList.remove('show');
+    document.getElementById('cityError').classList.remove('show');
+}
+
+// 选择其他选项
+function selectOtherCity(element) {
+    document.querySelectorAll('.city-item').forEach(item => {
+        item.classList.remove('selected');
+    });
+    
+    element.classList.add('selected');
+    selectedCity = 'other';
+    document.getElementById('otherInput').classList.add('show');
+    document.getElementById('customCity').focus();
+    document.getElementById('cityError').classList.remove('show');
+}
+
+// 更新自定义城市
+function updateCustomCity() {
+    customCityName = document.getElementById('customCity').value.trim();
+}
+
+// 进入提交页面
+function nextToSubmit() {
+    if (!selectedCity) {
+        document.getElementById('cityError').classList.add('show');
+        return;
+    }
+    
+    if (selectedCity === 'other' && !customCityName) {
+        document.getElementById('cityError').textContent = '请填写城市名称！';
+        document.getElementById('cityError').classList.add('show');
+        return;
+    }
+    
+    // 更新摘要信息
+    const cityText = selectedCity === 'other' ? customCityName : selectedCity;
+    document.getElementById('summaryDates').textContent = selectedDates.join('、');
+    document.getElementById('summaryCity').textContent = cityText;
+    
+    showStep('step3');
+}
+
+// 提交表单
+function submitForm() {
+    showStep('successPage');
+    
+    // 这里可以添加实际的提交逻辑，比如发送到服务器
+    console.log('提交的数据：', {
+        dates: selectedDates,
+        city: selectedCity === 'other' ? customCityName : selectedCity
+    });
+}
+
+// 返回上一步
+function backToStep1() {
+    showStep('step1');
+}
+
+function backToStep2() {
+    showStep('step2');
+}
+
+// 显示指定步骤
+function showStep(stepId) {
+    document.querySelectorAll('.step').forEach(step => {
+        step.classList.remove('active');
+    });
+    document.getElementById(stepId).classList.add('active');
+}
+
+// 如果日期选择少于两天，显示结束页面
+function checkDatesAndProceed() {
+    if (selectedDates.length < 2) {
+        showStep('endPage');
+    } else {
+        nextToCity();
+    }
+}
+</script>
+</body>
+</html>
+```
+
+
+这个网页包含了您要求的所有功能：
+
+## 主要功能：
+
+### 📅 第一步：日期选择
+- 显示5月1日到5月5日
+- 可选择多天，必须选择**至少两天**才能继续
+- 少于两天会提示错误
+- 支持重置选择
+
+### 🏙️ 第二步：城市选择
+- **10个热门城市**：北京、上海、广州、深圳、成都、杭州、西安、重庆、南京、武汉
+- **其他选项**：点击后可手动输入城市名称
+- 必须选择一个城市才能继续
+
+### ✅ 第三步：确认提交
+- 显示选择的日期和城市
+- 可以返回修改或直接提交
+- 提交后显示成功页面
+
+## 特色设计：
+- ✨ 渐变色背景和按钮
+- 📱 移动端完美适配
+- 🎯 进度条显示当前步骤
+- 💫 流畅的动画效果
+- ⚠️ 友好的错误提示
+- 🔄 可以随时返回上一步
+
+您可以直接保存为 HTML 文件并在浏览器中打开使用！
