@@ -172,6 +172,52 @@ button {
     box-shadow: 0 6px 18px rgba(102, 126, 234, 0.35);
 }
 
+.city-intro {
+    margin-top: 20px;
+    padding: 20px;
+    background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+    border-radius: 16px;
+    display: none;
+    animation: slideDown 0.4s ease;
+}
+
+.city-intro.show {
+    display: block;
+}
+
+@keyframes slideDown {
+    from { opacity: 0; max-height: 0; }
+    to { opacity: 1; max-height: 500px; }
+}
+
+.intro-title {
+    font-size: 20px;
+    font-weight: 700;
+    color: #333;
+    margin-bottom: 12px;
+    text-align: center;
+}
+
+.intro-section {
+    margin: 12px 0;
+    padding: 12px;
+    background: white;
+    border-radius: 10px;
+}
+
+.intro-label {
+    font-size: 14px;
+    color: #667eea;
+    font-weight: 600;
+    margin-bottom: 6px;
+}
+
+.intro-text {
+    font-size: 14px;
+    color: #555;
+    line-height: 1.6;
+}
+
 .other-input {
     margin-top: 15px;
     display: none;
@@ -180,11 +226,6 @@ button {
 .other-input.show {
     display: block;
     animation: slideDown 0.3s ease;
-}
-
-@keyframes slideDown {
-    from { opacity: 0; max-height: 0; }
-    to { opacity: 1; max-height: 100px; }
 }
 
 input[type="text"] {
@@ -343,6 +384,18 @@ input[type="text"]:focus {
             <div class="city-item" data-city="other" onclick="selectOtherCity(this)">其他 ✏️</div>
         </div>
         
+        <div class="city-intro" id="cityIntro">
+            <div class="intro-title" id="introTitle"></div>
+            <div class="intro-section">
+                <div class="intro-label">🍜 美食推荐</div>
+                <div class="intro-text" id="introFood"></div>
+            </div>
+            <div class="intro-section">
+                <div class="intro-label">🎯 必玩景点</div>
+                <div class="intro-text" id="introPlay"></div>
+            </div>
+        </div>
+        
         <div class="other-input" id="otherInput">
             <input type="text" id="customCity" placeholder="输入城市名称..." oninput="updateCustomCity()">
         </div>
@@ -408,6 +461,49 @@ let selectedDates = [];
 let selectedCity = '';
 let customCityName = '';
 
+const cityData = {
+    '北京': {
+        food: '烤鸭、炸酱面、豆汁儿、涮羊肉、驴打滚、糖火烧',
+        play: '故宫、长城、颐和园、天坛、南锣鼓巷、三里屯'
+    },
+    '上海': {
+        food: '小笼包、生煎包、红烧肉、本帮菜、蟹粉豆腐、鲜肉月饼',
+        play: '外滩、东方明珠、迪士尼、豫园、南京路、武康路'
+    },
+    '广州': {
+        food: '早茶、肠粉、云吞面、白切鸡、烧鹅、双皮奶、艇仔粥',
+        play: '广州塔、长隆、沙面、上下九、白云山、珠江夜游'
+    },
+    '深圳': {
+        food: '椰子鸡、海鲜大餐、肠粉、烧腊、猪肚鸡、椰子冻',
+        play: '世界之窗、欢乐谷、大梅沙、东部华侨城、莲花山'
+    },
+    '成都': {
+        food: '火锅、串串香、担担面、兔头、钟水饺、龙抄手、三大炮',
+        play: '宽窄巷子、锦里、大熊猫基地、武侯祠、杜甫草堂、春熙路'
+    },
+    '杭州': {
+        food: '西湖醋鱼、龙井虾仁、东坡肉、叫花鸡、片儿川、葱包烩',
+        play: '西湖、灵隐寺、宋城、千岛湖、西溪湿地、雷峰塔'
+    },
+    '西安': {
+        food: '肉夹馍、羊肉泡馍、凉皮、biangbiang面、葫芦鸡、甑糕',
+        play: '兵马俑、大雁塔、钟鼓楼、城墙、回民街、大唐不夜城'
+    },
+    '重庆': {
+        food: '火锅、小面、酸辣粉、毛血旺、江湖菜、山城小汤圆',
+        play: '洪崖洞、磁器口、解放碑、长江索道、武隆、大足石刻'
+    },
+    '南京': {
+        food: '盐水鸭、鸭血粉丝汤、秦淮小吃、盐水鸭、牛肉锅贴、梅花糕',
+        play: '夫子庙、中山陵、玄武湖、明孝陵、总统府、秦淮河'
+    },
+    '武汉': {
+        food: '热干面、鸭脖、豆皮、糊汤粉、面窝、武昌鱼、汤包',
+        play: '黄鹤楼、东湖、户部巷、武汉大学、江汉路、长江大桥'
+    }
+};
+
 function toggleDate(element) {
     const date = element.dataset.date;
     
@@ -444,6 +540,15 @@ function selectCity(element) {
     selectedCity = element.dataset.city;
     document.getElementById('otherInput').classList.remove('show');
     document.getElementById('cityError').classList.remove('show');
+    
+    if (cityData[selectedCity]) {
+        document.getElementById('introTitle').textContent = selectedCity;
+        document.getElementById('introFood').textContent = cityData[selectedCity].food;
+        document.getElementById('introPlay').textContent = cityData[selectedCity].play;
+        document.getElementById('cityIntro').classList.add('show');
+    } else {
+        document.getElementById('cityIntro').classList.remove('show');
+    }
 }
 
 function selectOtherCity(element) {
@@ -456,6 +561,7 @@ function selectOtherCity(element) {
     document.getElementById('otherInput').classList.add('show');
     document.getElementById('customCity').focus();
     document.getElementById('cityError').classList.remove('show');
+    document.getElementById('cityIntro').classList.remove('show');
 }
 
 function updateCustomCity() {
@@ -505,6 +611,7 @@ function restart() {
     document.getElementById('customCity').value = '';
     document.getElementById('otherInput').classList.remove('show');
     document.getElementById('cityError').classList.remove('show');
+    document.getElementById('cityIntro').classList.remove('show');
     showStep('step1');
 }
 
